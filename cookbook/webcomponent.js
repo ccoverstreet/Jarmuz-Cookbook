@@ -19,13 +19,20 @@ class extends HTMLElement {
 
 		this.shadowRoot.innerHTML = `
 <link rel="stylesheet" href="/assets/standard.css"/>
+<style>
+svg > path {
+	stroke: var(--clr-accent);
+	stroke-width: 30px;
+	stroke-linecap: round;
+	fill: transparent;
+}
+</style>
 <div class="jmod-wrapper">
 	<div class="jmod-header" style="display:flex">
 		<h1 id="title">${this.config.title}</h1>
 		<svg viewBox="0 0 360 360">
-			<path d="M150,300 A30,60,0,0,1,210,300" stroke="var(--clr-accent)" stroke-width="30" stroke-linecap="round" fill="transparent"/>
-			<path d="M105,300 A60,90,0,0,1,255,300" stroke="var(--clr-accent)" stroke-width="30" stroke-linecap="round" fill="transparent"/>
-			<path d="M60,300 A60,80,0,0,1,300,300" stroke="var(--clr-accent)" stroke-width="30" stroke-linecap="round" fill="transparent"/>
+			<path d="M60,60 L60,240  L180,300 L300,240 L300,60 L180,120 L60,60"/>
+			<path d="M180,120 L180,300"/>
 		</svg>
 	</div>
 
