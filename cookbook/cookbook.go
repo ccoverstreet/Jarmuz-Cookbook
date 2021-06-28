@@ -64,14 +64,21 @@ func CreateCookbook(jablkoCorePort, jmodPort, jmodKey, jmodDataDir, jmodConfig s
 		make(map[string]Recipe),
 	}
 
-	if len(jmodConfig) < 4 {
+	fShouldSave := len(jmodConfig) < 4
+
+	if fShouldSave {
 		jmodConfig = defaultConfig
-		book.SaveConfig()
 	}
+
+	log.Println(jmodConfig)
 
 	err := json.Unmarshal([]byte(jmodConfig), &book)
 	if err != nil {
 		panic(err)
+	}
+
+	if fShouldSave {
+		book.SaveConfig()
 	}
 
 	// Try to read recipe database if it exists
@@ -107,11 +114,12 @@ func (book *Cookbook) GetRouter() *http.ServeMux {
 }
 
 func (book *Cookbook) SaveConfig() error {
-
 	b, err := json.Marshal(book)
 	if err != nil {
 		return err
 	}
+
+	log.Println(string(b))
 
 	err = jablkodev.JablkoSaveConfig(book.jablkoCorePort,
 		book.jmodPort,
@@ -143,7 +151,6 @@ func (book *Cookbook) GetRecipeNames() []string {
 		names = append(names, name)
 	}
 
-	log.Println(names)
 	return names
 }
 
@@ -157,8 +164,6 @@ func (book *Cookbook) AddRecipe(name string, ingredients string, instructions st
 	}
 
 	book.recipes[name] = Recipe{ingredients, instructions}
-
-	log.Println(book.recipes)
 
 	return book.SaveRecipeDatabase()
 }
