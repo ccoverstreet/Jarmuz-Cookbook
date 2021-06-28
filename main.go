@@ -14,7 +14,7 @@ func main() {
 	JMODPort := os.Getenv("JABLKO_MOD_PORT")
 	JMODKey := os.Getenv("JABLKO_MOD_KEY")
 	JMODDataDir := os.Getenv("JABLKO_MOD_DATA_DIR")
-	JMODConfig := os.Getenv("JMOD")
+	JMODConfig := os.Getenv("JABLKO_MOD_CONFIG")
 
 	app := cookbook.CreateCookbook(JablkoCorePort, JMODPort, JMODKey, JMODDataDir, JMODConfig)
 	log.Println(app)

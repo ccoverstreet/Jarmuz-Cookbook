@@ -6,17 +6,30 @@ class extends HTMLElement {
 		this.addRecipe = this.addRecipe.bind(this);
 
 		this.attachShadow({mode: "open"});
+		
+	}
+
+	init(source, instName, config) {
+		this.source = source;
+		this.instName = instName;
+		this.config = config;
+		console.log(this.config);
+
+		this.getRecipeList()
+
 		this.shadowRoot.innerHTML = `
 <link rel="stylesheet" href="/assets/standard.css"/>
 <div class="jmod-wrapper">
 	<div class="jmod-header" style="display:flex">
-		<h1>Cookbook</h1>
+		<h1 id="title">${this.config.title}</h1>
 		<svg viewBox="0 0 360 360">
 			<path d="M150,300 A30,60,0,0,1,210,300" stroke="var(--clr-accent)" stroke-width="30" stroke-linecap="round" fill="transparent"/>
 			<path d="M105,300 A60,90,0,0,1,255,300" stroke="var(--clr-accent)" stroke-width="30" stroke-linecap="round" fill="transparent"/>
 			<path d="M60,300 A60,80,0,0,1,300,300" stroke="var(--clr-accent)" stroke-width="30" stroke-linecap="round" fill="transparent"/>
 		</svg>
 	</div>
+
+	<hr>
 
 	<select id="recipe-selector" style="font-size: 1.25em;">
 	</select>
@@ -31,16 +44,7 @@ class extends HTMLElement {
 	<button onclick="this.getRootNode().host.addRecipe()">Add Recipe</button>
 	<button onclick="this.getRootNode().host.getRecipeList()">Get Recipes</button>
 </div>
-
 		`
-	}
-
-	init(source, instName, config) {
-		this.source = source;
-		this.instName = instName;
-		this.config = config;
-
-		this.getRecipeList()
 	}
 
 	getRecipeList() {
