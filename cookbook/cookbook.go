@@ -15,6 +15,8 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"sort"
+	"strings"
 	"sync"
 
 	"github.com/ccoverstreet/Jarmuz-Cookbook/jablkodev"
@@ -35,8 +37,8 @@ type Instance struct {
 }
 
 type Recipe struct {
-	Ingredients  string
-	Instructions string
+	Ingredients  string `json:"ingredients"`
+	Instructions string `json:"instructions"`
 }
 
 type Cookbook struct {
@@ -105,6 +107,8 @@ func CreateCookbook(jablkoCorePort, jmodPort, jmodKey, jmodDataDir, jmodConfig s
 
 	book.mux.HandleFunc("/jmod/getRecipeList", book.GetRecipeListHandler)
 	book.mux.HandleFunc("/jmod/addRecipe", book.AddRecipeHandler)
+	book.mux.HandleFunc("/jmod/removeRecipe", book.RemoveRecipeHandler)
+	book.mux.HandleFunc("/jmod/getRecipe", book.GetRecipeHandler)
 
 	return book
 }
@@ -151,6 +155,9 @@ func (book *Cookbook) GetRecipeNames() []string {
 		names = append(names, name)
 	}
 
+	// From StackOverflow
+	sort.Slice(names, func(i, j int) bool { return strings.ToLower(names[i]) < strings.ToLower(names[j]) })
+
 	return names
 }
 
@@ -166,4 +173,29 @@ func (book *Cookbook) AddRecipe(name string, ingredients string, instructions st
 	book.recipes[name] = Recipe{ingredients, instructions}
 
 	return book.SaveRecipeDatabase()
+}
+
+func (book *Cookbook) RemoveRecipe(name string) error {
+	book.Lock()
+	defer book.Unlock()
+
+	if _, ok := book.recipes[name]; !ok {
+		return fmt.Errorf("Recipe does not exist")
+	}
+
+	delete(book.recipes, name)
+
+	return book.SaveRecipeDatabase()
+}
+
+func (book *Cookbook) GetRecipe(name string) (Recipe, error) {
+	book.RLock()
+	defer book.RUnlock()
+
+	recipe, ok := book.recipes[name]
+	if !ok {
+		return Recipe{}, fmt.Errorf("Recipe does not exist")
+	}
+
+	return recipe, nil
 }

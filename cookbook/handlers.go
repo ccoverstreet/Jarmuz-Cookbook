@@ -87,3 +87,66 @@ func (book *Cookbook) AddRecipeHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 }
+
+func (book *Cookbook) RemoveRecipeHandler(w http.ResponseWriter, r *http.Request) {
+	type ReqBody struct {
+		Name string `json:"name"`
+	}
+
+	req := ReqBody{}
+
+	body, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		handleError("Unable to read body", err, w)
+		return
+	}
+
+	err = json.Unmarshal(body, &req)
+	if err != nil {
+		handleError("Unable to marshal body", err, w)
+		return
+	}
+
+	err = book.RemoveRecipe(req.Name)
+	if err != nil {
+		handleError("Unable to remove recipe", err, w)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	fmt.Fprintf(w, "Removed recipe")
+}
+
+func (book *Cookbook) GetRecipeHandler(w http.ResponseWriter, r *http.Request) {
+	type ReqBody struct {
+		Name string `json:"name"`
+	}
+
+	req := ReqBody{}
+
+	body, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		handleError("Unable to read body", err, w)
+		return
+	}
+
+	err = json.Unmarshal(body, &req)
+	if err != nil {
+		handleError("Unable to marshal body", err, w)
+		return
+	}
+
+	recipe, err := book.GetRecipe(req.Name)
+	if err != nil {
+		handleError("Unable to get recipe", err, w)
+		return
+	}
+
+	b, err := json.Marshal(recipe)
+	if err != nil {
+		handleError("Unable to marshal recipe", err, w)
+		return
+	}
+
+	fmt.Fprintf(w, "%s", b)
+}

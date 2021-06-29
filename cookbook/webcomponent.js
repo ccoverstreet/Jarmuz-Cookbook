@@ -4,6 +4,7 @@ class extends HTMLElement {
 
 		this.getRecipeList = this.getRecipeList.bind(this);
 		this.addRecipe = this.addRecipe.bind(this);
+		this.getRecipe = this.getRecipe.bind(this);
 
 		this.attachShadow({mode: "open"});
 		
@@ -38,11 +39,13 @@ svg > path {
 
 	<hr>
 
-	<select id="recipe-selector" style="font-size: 1.25em;">
-	</select>
+	<select id="recipe-selector" style="font-size: 1.25em;"></select>
 
 	<div id="recipe-viewer">
-		<p>This would have a recipe viewer</p>
+		<h2>Ingredients</h2>
+		<textarea id="ingredients-viewer" readonly></textarea>
+		<h2>Instructions</h2>
+		<textarea id="instructions-viewer" readonly></textarea>
 	</div>
 
 	<input id="new-recipe-name"></input>
@@ -50,6 +53,9 @@ svg > path {
 	<textarea id="new-recipe-instructions"></textarea>
 	<button onclick="this.getRootNode().host.addRecipe()">Add Recipe</button>
 	<button onclick="this.getRootNode().host.getRecipeList()">Get Recipes</button>
+	<button onclick="this.getRootNode().host.removeRecipe()">Remove Recipe</button>
+
+	<button onclick="this.getRootNode().host.getRecipe()">Get Recipe Data</button>
 </div>
 		`
 	}
@@ -92,6 +98,54 @@ svg > path {
 		})
 			.then(async data => {
 				console.log(await data.text());
+				this.getRecipeList();
+			})
+			.catch(err => {
+				console.error(err);
+				console.log(err);
+			})
+	}
+
+	removeRecipe() {	
+		const name = this.shadowRoot.getElementById("recipe-selector").value;
+		
+		if (!confirm(`Are you sure you want to delete "${name}"`)) {
+			return
+		}
+
+		fetch(`/jmod/removeRecipe?JMOD-Source=${this.source}`, {
+			method: "POST",
+			headers: {
+				"Content-Type": "application/json"
+			},
+			body: JSON.stringify({name})
+		})
+			.then(async data => {
+				console.log(await data.text());
+				this.getRecipeList();
+			})
+			.catch(err => {
+				console.error(err);
+				console.log(err);
+			})
+	}
+
+	getRecipe() {
+		const name = this.shadowRoot.getElementById("recipe-selector").value;
+
+		fetch(`/jmod/getRecipe?JMOD-Source=${this.source}`, {
+			method: "POST",
+			headers: {
+				"Content-Type": "application/json"
+			},
+			body: JSON.stringify({name})
+		})
+			.then(async data => {
+				var res = await data.json();
+				console.log(res);
+				
+				this.shadowRoot.getElementById("ingredients-viewer").value = res.ingredients;
+				this.shadowRoot.getElementById("instructions-viewer").value = res.instructions;
 			})
 			.catch(err => {
 				console.error(err);
