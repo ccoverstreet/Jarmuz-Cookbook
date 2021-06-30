@@ -27,6 +27,11 @@ svg > path {
 	stroke-linecap: round;
 	fill: transparent;
 }
+
+.jmod-body {
+	display: flex;
+	flex-wrap: wrap;
+}
 </style>
 <div class="jmod-wrapper">
 	<div class="jmod-header" style="display:flex">
@@ -39,6 +44,7 @@ svg > path {
 
 	<hr>
 
+	<div class="jmod-body">
 	<select id="recipe-selector" style="font-size: 1.25em;"></select>
 
 	<div id="recipe-viewer">
@@ -56,6 +62,7 @@ svg > path {
 	<button onclick="this.getRootNode().host.removeRecipe()">Remove Recipe</button>
 
 	<button onclick="this.getRootNode().host.getRecipe()">Get Recipe Data</button>
+	</div>
 </div>
 		`
 	}
