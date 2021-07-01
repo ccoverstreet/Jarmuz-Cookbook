@@ -72,8 +72,6 @@ func CreateCookbook(jablkoCorePort, jmodPort, jmodKey, jmodDataDir, jmodConfig s
 		jmodConfig = defaultConfig
 	}
 
-	log.Println(jmodConfig)
-
 	err := json.Unmarshal([]byte(jmodConfig), &book)
 	if err != nil {
 		panic(err)
@@ -93,7 +91,6 @@ func CreateCookbook(jablkoCorePort, jmodPort, jmodKey, jmodDataDir, jmodConfig s
 
 		b = []byte("{}")
 	}
-	log.Println(string(b))
 
 	err = json.Unmarshal(b, &book.recipes)
 	if err != nil {
