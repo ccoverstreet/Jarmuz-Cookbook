@@ -72,8 +72,6 @@ func (book *Cookbook) AddRecipeHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	log.Println(string(b))
-
 	recipe := NewRecipe{}
 	err = json.Unmarshal(b, &recipe)
 	if err != nil {

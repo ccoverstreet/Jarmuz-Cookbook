@@ -121,8 +121,6 @@ func (book *Cookbook) SaveConfig() error {
 		return err
 	}
 
-	log.Println(string(b))
-
 	err = jablkodev.JablkoSaveConfig(book.jablkoCorePort,
 		book.jmodPort,
 		book.jmodKey,
