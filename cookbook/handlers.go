@@ -150,3 +150,34 @@ func (book *Cookbook) GetRecipeHandler(w http.ResponseWriter, r *http.Request) {
 
 	fmt.Fprintf(w, "%s", b)
 }
+
+func (book *Cookbook) UpdateRecipeHandler(w http.ResponseWriter, r *http.Request) {
+	type ReqBody struct {
+		Name         string `json:"name"`
+		Ingredients  string `json:"ingredients"`
+		Instructions string `json:"instructions"`
+	}
+
+	req := ReqBody{}
+
+	body, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		handleError("Unable to read body", err, w)
+		return
+	}
+
+	err = json.Unmarshal(body, &req)
+	if err != nil {
+		handleError("Unable to marshal body", err, w)
+		return
+	}
+
+	err = book.UpdateRecipe(req.Name, req.Ingredients, req.Instructions)
+	if err != nil {
+		handleError("Unable to update recipe", err, w)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	fmt.Fprintf(w, "Updated recipe")
+}

@@ -5,9 +5,9 @@ class extends HTMLElement {
 		this.getRecipeList = this.getRecipeList.bind(this);
 		this.addRecipe = this.addRecipe.bind(this);
 		this.getRecipe = this.getRecipe.bind(this);
+		this.updateRecipe = this.updateRecipe.bind(this);
 
 		this.attachShadow({mode: "open"});
-		
 	}
 
 	init(source, instName, config) {
@@ -32,6 +32,24 @@ svg > path {
 	display: flex;
 	flex-wrap: wrap;
 }
+
+#recipe-viewer {
+	display: flex;
+	flex-direction: column;
+	width: 100%;
+}
+#recipe-viewer > textarea {
+	height: 6em;
+}
+
+#new-recipe-viewer {
+	display: flex;
+	flex-direction: column;
+	width: 100%;
+}
+#new-recipe-viewer > textarea {
+	height: 6em;
+}
 </style>
 <div class="jmod-wrapper">
 	<div class="jmod-header" style="display:flex">
@@ -45,23 +63,42 @@ svg > path {
 	<hr>
 
 	<div class="jmod-body">
-	<select id="recipe-selector" style="font-size: 1.25em;"></select>
 
-	<div id="recipe-viewer">
-		<h2>Ingredients</h2>
-		<textarea id="ingredients-viewer" readonly></textarea>
-		<h2>Instructions</h2>
-		<textarea id="instructions-viewer" readonly></textarea>
-	</div>
+		<div id="recipe-viewer">
+			<div>
+				<select id="recipe-selector" style="font-size: 1.25em;"
+					onchange="this.getRootNode().host.getRecipe()"></select>
+				<button onclick="this.getRootNode().host.showNewRecipeViewer()"
+					style="background-color: var(--clr-green)">Add</button>
+			</div>
 
-	<input id="new-recipe-name"></input>
-	<textarea id="new-recipe-ingredients"></textarea>
-	<textarea id="new-recipe-instructions"></textarea>
-	<button onclick="this.getRootNode().host.addRecipe()">Add Recipe</button>
-	<button onclick="this.getRootNode().host.getRecipeList()">Get Recipes</button>
-	<button onclick="this.getRootNode().host.removeRecipe()">Remove Recipe</button>
+			<h2>Ingredients</h2>
+			<textarea id="ingredients-viewer" ></textarea>
+			<h2>Instructions</h2>
+			<textarea id="instructions-viewer" ></textarea>
 
-	<button onclick="this.getRootNode().host.getRecipe()">Get Recipe Data</button>
+			<button onclick="this.getRootNode().host.updateRecipe()"
+				style="background-color: var(--clr-green)">Update</button>
+			<button onclick="this.getRootNode().host.removeRecipe()"
+				style="background-color: var(--clr-red)">Remove Recipe</button>
+		</div>
+
+		<div id="new-recipe-viewer" style="display: none;">
+			<div style="display: flex; width: 100%;">
+			<h2>Name</h2>
+			<input id="new-recipe-name" 
+				style="background-color: var(--clr-background); color: var(--clr-font-high); margin-right: 1em;"></input>
+			</div>
+			
+			<h2>Ingredients</h2>
+			<textarea id="new-recipe-ingredients"></textarea>
+			<h2>Instructions</h2>
+			<textarea id="new-recipe-instructions"></textarea>
+			<button onclick="this.getRootNode().host.addRecipe()"
+				style="background-color: var(--clr-green)">Add Recipe</button>
+			<button onclick="this.getRootNode().host.showRecipeViewer()"
+				style="background-color: var(--clr-red)">Cancel</button>
+		</div>
 	</div>
 </div>
 		`
@@ -74,6 +111,12 @@ svg > path {
 				const selectElem = this.shadowRoot.getElementById("recipe-selector");
 
 				selectElem.innerHTML = "";
+
+				// Create empty option for default
+				var base = document.createElement("option");
+				base.value = "";
+				base.textContent = "";
+				selectElem.appendChild(base);
 
 				for (name of res) {
 					var opt = document.createElement("option");
@@ -90,6 +133,10 @@ svg > path {
 
 	addRecipe() {
 		const name = this.shadowRoot.getElementById("new-recipe-name").value;
+		if (name == "") {
+			alert("Recipe name cannot be empty");
+			return;
+		}
 		const ingredients = this.shadowRoot.getElementById("new-recipe-ingredients").value;
 		const instructions = this.shadowRoot.getElementById("new-recipe-instructions").value;
 
@@ -106,6 +153,10 @@ svg > path {
 			.then(async data => {
 				console.log(await data.text());
 				this.getRecipeList();
+				this.showRecipeViewer();
+				this.shadowRoot.getElementById("new-recipe-name").value = "";
+				this.shadowRoot.getElementById("new-recipe-ingredients").value = "";
+				this.shadowRoot.getElementById("new-recipe-instructions").value = "";
 			})
 			.catch(err => {
 				console.error(err);
@@ -115,6 +166,9 @@ svg > path {
 
 	removeRecipe() {	
 		const name = this.shadowRoot.getElementById("recipe-selector").value;
+		if (name == "") {
+			return;
+		}
 		
 		if (!confirm(`Are you sure you want to delete "${name}"`)) {
 			return
@@ -129,6 +183,8 @@ svg > path {
 		})
 			.then(async data => {
 				console.log(await data.text());
+				this.shadowRoot.getElementById("ingredients-viewer").value = "";
+				this.shadowRoot.getElementById("instructions-viewer").value = "";
 				this.getRecipeList();
 			})
 			.catch(err => {
@@ -139,6 +195,9 @@ svg > path {
 
 	getRecipe() {
 		const name = this.shadowRoot.getElementById("recipe-selector").value;
+		if (name == "") {
+			return;
+		}
 
 		fetch(`/jmod/getRecipe?JMOD-Source=${this.source}`, {
 			method: "POST",
@@ -158,5 +217,38 @@ svg > path {
 				console.error(err);
 				console.log(err);
 			})
+	}
+
+	updateRecipe() {
+		const reqBody = {
+			name: this.shadowRoot.getElementById("recipe-selector").value,
+			ingredients: this.shadowRoot.getElementById("ingredients-viewer").value,
+			instructions: this.shadowRoot.getElementById("instructions-viewer").value
+		};
+
+		fetch(`/jmod/updateRecipe?JMOD-Source=${this.source}`, {
+			method: "POST",
+			headers: {
+				"Content-Type": "application/json"
+			},
+			body: JSON.stringify(reqBody)
+		})
+			.then(async data => {
+				console.log(await data.text());
+			})
+			.catch(err => {
+				console.error(err);
+				console.log(err);
+			})
+	}
+
+	showNewRecipeViewer() {
+		this.shadowRoot.getElementById("recipe-viewer").style.display = "none";
+		this.shadowRoot.getElementById("new-recipe-viewer").style.display = "flex";
+	}	
+
+	showRecipeViewer() {
+		this.shadowRoot.getElementById("recipe-viewer").style.display = "flex";
+		this.shadowRoot.getElementById("new-recipe-viewer").style.display = "none";
 	}
 }

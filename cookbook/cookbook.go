@@ -109,6 +109,7 @@ func CreateCookbook(jablkoCorePort, jmodPort, jmodKey, jmodDataDir, jmodConfig s
 	book.mux.HandleFunc("/jmod/addRecipe", book.AddRecipeHandler)
 	book.mux.HandleFunc("/jmod/removeRecipe", book.RemoveRecipeHandler)
 	book.mux.HandleFunc("/jmod/getRecipe", book.GetRecipeHandler)
+	book.mux.HandleFunc("/jmod/updateRecipe", book.UpdateRecipeHandler)
 
 	return book
 }
@@ -134,7 +135,7 @@ func (book *Cookbook) SaveConfig() error {
 }
 
 func (book *Cookbook) SaveRecipeDatabase() error {
-	b, err := json.Marshal(book.recipes)
+	b, err := json.MarshalIndent(book.recipes, "", "  ")
 	if err != nil {
 		return err
 	}
@@ -198,4 +199,14 @@ func (book *Cookbook) GetRecipe(name string) (Recipe, error) {
 	}
 
 	return recipe, nil
+}
+
+func (book *Cookbook) UpdateRecipe(name string, ingredients string, instructions string) error {
+	if _, ok := book.recipes[name]; !ok {
+		return fmt.Errorf("Recipe does not exist")
+	}
+
+	book.recipes[name] = Recipe{ingredients, instructions}
+
+	return book.SaveRecipeDatabase()
 }
