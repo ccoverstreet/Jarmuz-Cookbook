@@ -24,11 +24,11 @@ import (
 
 const defaultConfig = `
 {
-	"instances": {
-		"inst0": {
+	"instances": [
+		{
 			"title": "Cookbook"
 		}
-	}
+	]
 }
 `
 
@@ -43,7 +43,7 @@ type Recipe struct {
 
 type Cookbook struct {
 	sync.RWMutex
-	Instances      map[string]Instance `json:"instances"`
+	Instances      []Instance `json:"instances"`
 	jablkoCorePort string
 	jmodPort       string
 	jmodKey        string
@@ -57,7 +57,7 @@ type Cookbook struct {
 func CreateCookbook(jablkoCorePort, jmodPort, jmodKey, jmodDataDir, jmodConfig string) *Cookbook {
 	book := &Cookbook{
 		sync.RWMutex{},
-		make(map[string]Instance),
+		nil,
 		jablkoCorePort,
 		jmodPort,
 		jmodKey,
