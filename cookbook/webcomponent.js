@@ -10,9 +10,8 @@ class extends HTMLElement {
 		this.attachShadow({mode: "open"});
 	}
 
-	init(source, instName, config) {
+	init(source, config) {
 		this.source = source;
-		this.instName = instName;
 		this.config = config;
 		console.log(this.config);
 
