@@ -64,8 +64,8 @@ svg > path {
 	<div class="jmod-body">
 
 		<div id="recipe-viewer">
-			<div>
-				<select id="recipe-selector" style="font-size: 1.25em;"
+			<div style="display: flex; width: 100%; height: 3em;">
+				<select id="recipe-selector" style="font-size: 1.25em; flex: 1;"
 					onchange="this.getRootNode().host.getRecipe()"></select>
 				<button onclick="this.getRootNode().host.showNewRecipeViewer()"
 					style="background-color: var(--clr-green)">Add</button>
@@ -83,10 +83,10 @@ svg > path {
 		</div>
 
 		<div id="new-recipe-viewer" style="display: none;">
-			<div style="display: flex; width: 100%;">
-			<h2>Name</h2>
-			<input id="new-recipe-name" 
-				style="background-color: var(--clr-background); color: var(--clr-font-high); margin-right: 1em;"></input>
+			<div style="display: flex; width: 100%; height: 3em;">
+				<h2 style="display: flex; align-items: center;">Name</h2>
+				<input id="new-recipe-name" 
+					style="background-color: var(--clr-background); color: var(--clr-font-high); margin-right: 1em;"></input>
 			</div>
 			
 			<h2>Ingredients</h2>
