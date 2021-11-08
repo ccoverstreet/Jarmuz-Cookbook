@@ -10,7 +10,7 @@ class extends HTMLElement {
 		this.attachShadow({mode: "open"});
 	}
 
-	init(source, config) {
+	init = (source, config) => {
 		this.source = source;
 		this.config = config;
 		console.log(this.config);
@@ -88,7 +88,7 @@ svg > path {
 				<input id="new-recipe-name" 
 					style="background-color: var(--clr-background); color: var(--clr-font-high); margin-right: 1em;"></input>
 			</div>
-			
+
 			<h2>Ingredients</h2>
 			<textarea id="new-recipe-ingredients"></textarea>
 			<h2>Instructions</h2>
@@ -208,7 +208,7 @@ svg > path {
 			.then(async data => {
 				var res = await data.json();
 				console.log(res);
-				
+
 				this.shadowRoot.getElementById("ingredients-viewer").value = res.ingredients;
 				this.shadowRoot.getElementById("instructions-viewer").value = res.instructions;
 			})
@@ -244,7 +244,7 @@ svg > path {
 	showNewRecipeViewer() {
 		this.shadowRoot.getElementById("recipe-viewer").style.display = "none";
 		this.shadowRoot.getElementById("new-recipe-viewer").style.display = "flex";
-	}	
+	}
 
 	showRecipeViewer() {
 		this.shadowRoot.getElementById("recipe-viewer").style.display = "flex";

@@ -16,6 +16,11 @@ func main() {
 	JMODDataDir := os.Getenv("JABLKO_MOD_DATA_DIR")
 	JMODConfig := os.Getenv("JABLKO_MOD_CONFIG")
 
+	if len(JablkoCorePort) == 0 {
+		log.Println("ERROR: JABLKO_CORE_PORT not set")
+		return
+	}
+
 	app := cookbook.CreateCookbook(JablkoCorePort, JMODPort, JMODKey, JMODDataDir, JMODConfig)
 
 	log.Println(http.ListenAndServe(":"+JMODPort, app.GetRouter()))
